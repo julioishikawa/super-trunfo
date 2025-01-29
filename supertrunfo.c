@@ -1,15 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
-// Função para limpar o buffer de entrada
 void limpar_buffer() {
-    while (getchar() != '\n'); // Limpa todos os caracteres até o final da linha
+    while (getchar() != '\n');
 }
 
-// Função para formatar números inteiros com separadores de milhar (populacoes/areas)
-void formatar_numero(char *resultado, int numero) {
+void formatar_numero_inteiro(char *resultado, unsigned long int numero) {
     char buffer[50];
-    sprintf(buffer, "%d", numero);
+    sprintf(buffer, "%lu", numero);
     int len = strlen(buffer);
     int pos = 0, contador = 0;
 
@@ -17,12 +16,11 @@ void formatar_numero(char *resultado, int numero) {
         resultado[pos++] = buffer[i];
         contador++;
         if (contador % 3 == 0 && i > 0) {
-            resultado[pos++] = '.';  // Adiciona separador de milhares
+            resultado[pos++] = '.';
         }
     }
     resultado[pos] = '\0';
 
-    // Inverte a string para formar o número correto
     for (int i = 0; i < pos / 2; i++) {
         char temp = resultado[i];
         resultado[i] = resultado[pos - i - 1];
@@ -30,118 +28,188 @@ void formatar_numero(char *resultado, int numero) {
     }
 }
 
-// Função para formatar o PIB, com unidades de milhões, bilhões ou trilhões
-void formatar_pib(char *resultado, double pib) {
+void formatar_numero_flutuante(char *resultado, float numero) {
+    unsigned long int parte_inteira = (unsigned long int)numero;
+    formatar_numero_inteiro(resultado, parte_inteira);
+
+    float parte_decimal = numero - parte_inteira;
+    
+    if (parte_decimal > 0.0001f || parte_decimal < -0.0001f) {
+        char decimal_formatado[10];
+        sprintf(decimal_formatado, "%.2f", parte_decimal);
+        
+        if (decimal_formatado[0] == '0') {
+            strcat(resultado, decimal_formatado + 1);
+        } else {
+            strcat(resultado, decimal_formatado);
+        }
+        
+        int len = strlen(resultado);
+        if (len >= 3 && strcmp(resultado + len - 3, ".00") == 0) {
+            resultado[len - 3] = '\0';
+        }
+    }
+}
+
+void formatar_densidade_populacional(char *resultado, float densidade) {
+    unsigned long int densidade_inteira = (unsigned long int)(densidade + 0.5);
+    formatar_numero_inteiro(resultado, densidade_inteira);
+}
+
+void formatar_pib_per_capita(char *resultado, float pib_per_capita) {
+    formatar_numero_flutuante(resultado, pib_per_capita);
+    char pib_como_texto[50];
+    sprintf(pib_como_texto, "R$ %s", resultado);
+    strcpy(resultado, pib_como_texto);
+}
+
+void formatar_pib(char *resultado, float pib) {
     char buffer[50];
 
-    if (pib >= 1000000000000) {  // Se o PIB for maior ou igual a 1 trilhão
-        pib /= 1000000000000;  // Converte para trilhões
-        sprintf(buffer, "%.2f trilhões", pib);  // Exibe com 2 casas decimais
-    } else if (pib >= 1000000000) {  // Se o PIB for maior ou igual a 1 bilhão
-        pib /= 1000000000;  // Converte para bilhões
-        sprintf(buffer, "%.2f bilhões", pib);  // Exibe com 2 casas decimais
-    } else if (pib >= 1000000) {  // Se o PIB for maior ou igual a 1 milhão
-        pib /= 1000000;  // Converte para milhões
-        sprintf(buffer, "%.2f milhões", pib);  // Exibe com 2 casas decimais
+    if (pib >= 1000000000000) {
+        pib /= 1000000000000;
+        sprintf(buffer, "%.2f trilhões", pib);
+    } else if (pib >= 1000000000) {
+        pib /= 1000000000;
+        sprintf(buffer, "%.2f bilhões", pib);
+    } else if (pib >= 1000000) {
+        pib /= 1000000;
+        sprintf(buffer, "%.2f milhões", pib);
     } else {
-        // Para PIBs abaixo de 1 milhão, exibe como um inteiro com separadores de milhar
-        int pib_int = (int)pib;
-        formatar_numero(buffer, pib_int);
-        sprintf(buffer + strlen(buffer), "");  // Garantir a finalização da string
+        int pib_inteiro = (int)pib;
+        formatar_numero_inteiro(buffer, pib_inteiro);
     }
 
-    strcpy(resultado, buffer);  // Copia o resultado formatado
+    strcpy(resultado, buffer);
 }
 
-// Função para calcular a densidade populacional
-double calcular_densidade(int populacao, int area) {
-    if (area == 0) return 0;  // Evitar divisão por zero
-    return (double)populacao / area;
+// Função para formatar o Super Poder com separadores de milhar e sem casas decimais
+void formatar_super_poder(char *resultado, float super_poder) {
+    // Limitar a 0 casas decimais (pois é um número inteiro)
+    sprintf(resultado, "%.0f", super_poder);  // Utiliza %f para números float com 0 casas decimais
+    int len = strlen(resultado);
+    int pos = 0, contador = 0;
+
+    // Adicionar os números com separadores de milhar
+    char buffer[50];
+    for (int i = len - 1; i >= 0; i--) {
+        buffer[pos++] = resultado[i];
+        contador++;
+
+        // Adicionar separador de milhar a cada 3 dígitos
+        if (contador % 3 == 0 && i > 0) {
+            buffer[pos++] = '.';  // Adiciona o separador de milhar
+        }
+    }
+
+    buffer[pos] = '\0';
+
+    // Inverter a string para corrigir a ordem dos caracteres
+    for (int i = 0; i < pos / 2; i++) {
+        char temp = buffer[i];
+        buffer[i] = buffer[pos - i - 1];
+        buffer[pos - i - 1] = temp;
+    }
+
+    strcpy(resultado, buffer);  // Copiar para a variável final de resultado
 }
 
-// Função para calcular o PIB per capita
-double calcular_pib_per_capita(double pib, int populacao) {
-    if (populacao == 0) return 0;  // Evitar divisão por zero
+float calcular_densidade_populacional(unsigned long int populacao, float area) {
+    if (area == 0) return 0;
+    return (float)populacao / area;
+}
+
+float calcular_pib_per_capita(float pib, unsigned long int populacao) {
+    if (populacao == 0) return 0;
     return pib / populacao;
 }
 
-// Função para formatar números flutuantes com separador de milhar e 2 casas decimais
-void formatar_float(char *resultado, double numero) {
-    int inteiro = (int)numero;
-    formatar_numero(resultado, inteiro);
-
-    // Calcula a parte decimal e adiciona com 2 casas decimais
-    double decimal = numero - inteiro;
-    char decimal_formatado[10];
-    sprintf(decimal_formatado, "%.2f", decimal);
-    // Remover o ponto extra entre a parte inteira e decimal
-    if (decimal_formatado[0] == '0') {
-        strcpy(resultado + strlen(resultado), decimal_formatado + 1); // Remove o '0' à esquerda
-    } else {
-        strcpy(resultado + strlen(resultado), decimal_formatado);
-    }
+float calcular_super_poder(float pib, unsigned long int populacao, float area, int pontos_turisticos, float densidade, float pib_per_capita) {
+    float super_poder = 0;
+    
+    super_poder += populacao;
+    super_poder += area;
+    super_poder += pib;
+    super_poder += pontos_turisticos;
+    super_poder += densidade;
+    super_poder += pib_per_capita;
+    
+    return super_poder;
 }
 
-#define NUM_ESTADOS 8
-#define NUM_CIDADES 4
+#define NUM_ESTADOS 1
+#define NUM_CIDADES 1
 
 int main() {
-    int populacoes[NUM_ESTADOS][NUM_CIDADES];
-    int areas[NUM_ESTADOS][NUM_CIDADES];
-    double pibs[NUM_ESTADOS][NUM_CIDADES];
-    int pontosTuristicos[NUM_ESTADOS][NUM_CIDADES];
+    unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES];
+    float areas[NUM_ESTADOS][NUM_CIDADES];
+    float pibs[NUM_ESTADOS][NUM_CIDADES];
+    int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES];
+    char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50];
+    char estados[] = "ABCDEFGH";
 
-    char estados[] = "ABCDEFGH"; // Identificadores dos estados
-    
     printf("Bem-vindo ao sistema de cadastro de cartas do Super Trunfo - Tema: Países\n");
     printf("Você cadastrará as cidades para cada estado.\n\n");
     printf("Não utilize pontos/virgulas, utilize apenas números. \n\n");
 
-    // Cadastro de dados
     for (int i = 0; i < NUM_ESTADOS; i++) {
         for (int j = 0; j < NUM_CIDADES; j++) {
             char codigo[5];
             sprintf(codigo, "%c%02d", estados[i], j + 1);
             printf("Estado %c, Cidade %d (Código %s):\n", estados[i], j + 1, codigo);
 
-            // Entrada e validação dos dados
+            while (1) {
+                printf("  Nome da cidade: ");
+                fgets(nomes_cidades[i][j], sizeof(nomes_cidades[i][j]), stdin);
+                nomes_cidades[i][j][strcspn(nomes_cidades[i][j], "\n")] = '\0';
+                if (strlen(nomes_cidades[i][j]) > 0) {
+                    break;
+                } else {
+                    printf("Erro: O nome da cidade não pode ser vazio. Tente novamente.\n");
+                }
+            }
+
             while (1) {
                 printf("  População: ");
-                if (scanf("%d", &populacoes[i][j]) == 1 && populacoes[i][j] >= 0) {
-                    break;  // Sai do loop se a entrada for válida
+                if (scanf("%lu", &populacoes[i][j]) == 1 && populacoes[i][j] >= 0) {
+                    limpar_buffer();
+                    break;
                 } else {
                     printf("Erro: A população não pode ser negativa ou não numérica. Tente novamente.\n");
-                    limpar_buffer();  // Limpa o buffer de entrada para tentar novamente
+                    limpar_buffer();
                 }
             }
 
             while (1) {
                 printf("  Área (em km²): ");
-                if (scanf("%d", &areas[i][j]) == 1 && areas[i][j] > 0) {
-                    break;  // Sai do loop se a entrada for válida
+                if (scanf("%f", &areas[i][j]) == 1 && areas[i][j] > 0) {
+                    limpar_buffer();
+                    break;
                 } else {
                     printf("Erro: A área deve ser um número positivo. Tente novamente.\n");
-                    limpar_buffer();  // Limpa o buffer de entrada para tentar novamente
+                    limpar_buffer();
                 }
             }
 
             while (1) {
                 printf("  PIB: ");
-                if (scanf("%lf", &pibs[i][j]) == 1 && pibs[i][j] >= 0) {
-                    break;  // Sai do loop se a entrada for válida
+                if (scanf("%f", &pibs[i][j]) == 1 && pibs[i][j] >= 0) {
+                    limpar_buffer();
+                    break;
                 } else {
                     printf("Erro: O PIB deve ser um número válido e não negativo. Tente novamente.\n");
-                    limpar_buffer();  // Limpa o buffer de entrada para tentar novamente
+                    limpar_buffer();
                 }
             }
 
             while (1) {
                 printf("  Número de pontos turísticos: ");
-                if (scanf("%d", &pontosTuristicos[i][j]) == 1 && pontosTuristicos[i][j] >= 0) {
-                    break;  // Sai do loop se a entrada for válida
+                if (scanf("%d", &pontos_turisticos[i][j]) == 1 && pontos_turisticos[i][j] >= 0) {
+                    limpar_buffer();
+                    break;
                 } else {
                     printf("Erro: O número de pontos turísticos não pode ser negativo ou não numérico. Tente novamente.\n");
-                    limpar_buffer();  // Limpa o buffer de entrada para tentar novamente
+                    limpar_buffer();
                 }
             }
 
@@ -149,38 +217,39 @@ int main() {
         }
     }
 
-    // Exibição dos dados cadastrados
-    printf("\nCartas cadastradas:\n");
-    printf("=========================\n");
     for (int i = 0; i < NUM_ESTADOS; i++) {
         for (int j = 0; j < NUM_CIDADES; j++) {
             char codigo[5];
             sprintf(codigo, "%c%02d", estados[i], j + 1);
 
-            char populacao_formatada[50], area_formatada[50], pib_formatado[50];
-            formatar_numero(populacao_formatada, populacoes[i][j]);
-            formatar_numero(area_formatada, areas[i][j]);
+            char populacao_formatada[50], area_formatada[50], pib_formatado[50], super_poder_formatado[50];
+            formatar_numero_inteiro(populacao_formatada, populacoes[i][j]);
+            formatar_numero_inteiro(area_formatada, (unsigned long int)areas[i][j]);
             formatar_pib(pib_formatado, pibs[i][j]);
 
-            // Cálculo da densidade e do PIB per capita
-            double densidade = calcular_densidade(populacoes[i][j], areas[i][j]);
-            double pib_per_capita = calcular_pib_per_capita(pibs[i][j], populacoes[i][j]);
+            float densidade = calcular_densidade_populacional(populacoes[i][j], areas[i][j]);
+            float pib_per_capita = calcular_pib_per_capita(pibs[i][j], populacoes[i][j]);
 
-            // Exibição
+            float super_poder = calcular_super_poder(pibs[i][j], populacoes[i][j], areas[i][j], pontos_turisticos[i][j], densidade, pib_per_capita);
+
             printf("Código: %s\n", codigo);
+            printf("Nome da Cidade: %s\n", nomes_cidades[i][j]);
             printf("População: %s habitantes\n", populacao_formatada);
             printf("Área: %s km²\n", area_formatada);
             printf("PIB: %s\n", pib_formatado);
-            printf("Pontos turísticos: %d\n", pontosTuristicos[i][j]);
+            printf("Pontos turísticos: %d\n", pontos_turisticos[i][j]);
 
-            // Exibir densidade e PIB per capita com formatação
             printf("Densidade Populacional: ");
-            formatar_float(populacao_formatada, densidade);
+            formatar_densidade_populacional(populacao_formatada, densidade);
             printf("%s habitantes/km²\n", populacao_formatada);
 
             printf("PIB per Capita: ");
-            formatar_float(populacao_formatada, pib_per_capita);
+            formatar_pib_per_capita(populacao_formatada, pib_per_capita);
             printf("R$ %s por habitante\n", populacao_formatada);
+
+            printf("Super Poder: ");
+            formatar_super_poder(super_poder_formatado, super_poder);
+            printf("%s\n", super_poder_formatado);
 
             printf("-------------------------\n");
         }
