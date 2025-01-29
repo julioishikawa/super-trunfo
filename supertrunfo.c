@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
+#include <math.h>
 
 void limpar_buffer() {
     while (getchar() != '\n');
@@ -52,14 +53,27 @@ void formatar_numero_flutuante(char *resultado, float numero) {
 }
 
 void formatar_densidade_populacional(char *resultado, float densidade) {
-    unsigned long int densidade_inteira = (unsigned long int)(densidade + 0.5);
-    formatar_numero_inteiro(resultado, densidade_inteira);
+    if (densidade >= 1) {
+        // Formata como número inteiro com separadores de milhar
+        unsigned long int densidade_inteira = (unsigned long int)(densidade + 0.5);
+        formatar_numero_inteiro(resultado, densidade_inteira);
+    } else {
+        // Se for menor que 1, ajusta dinamicamente o número de casas decimais
+        if (densidade == 0) {
+            sprintf(resultado, "0");
+        } else {
+            int casas_decimais = (int) ceil(-log10(densidade)) + 1;
+            char formato[10];
+            sprintf(formato, "%%.%df", casas_decimais);
+            sprintf(resultado, formato, densidade);
+        }
+    }
 }
 
 void formatar_pib_per_capita(char *resultado, float pib_per_capita) {
     formatar_numero_flutuante(resultado, pib_per_capita);
     char pib_como_texto[50];
-    sprintf(pib_como_texto, "R$ %s", resultado);
+    sprintf(pib_como_texto, "%s", resultado);
     strcpy(resultado, pib_como_texto);
 }
 
@@ -128,7 +142,7 @@ float calcular_super_poder(float pib, unsigned long int populacao, float area, i
     float super_poder = 0;
     
     super_poder += populacao;
-    super_poder += area;
+    super_poder += area / 1000;
     super_poder += pib;
     super_poder += pontos_turisticos;
     super_poder += densidade;
