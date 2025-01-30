@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "utilidades.h": "c",
+    "string.h": "c",
+    "cartas.h": "c"
+  }
+}
