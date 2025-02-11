@@ -1,8 +1,8 @@
 #ifndef CARTAS_H
 #define CARTAS_H
 
-#define NUM_ESTADOS 1
-#define NUM_CIDADES 2
+#define NUM_ESTADOS 8
+#define NUM_CIDADES 4
 
 extern char estados[];
 

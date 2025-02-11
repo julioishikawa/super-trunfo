@@ -11,7 +11,7 @@ void cadastrar_cartas(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES],
                       int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES],
                       char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50])
 {
-    printf("\nVoce cadastrara as cidades para cada estado.\n");
+    printf("\nVoce ira cadastrar as cidades para cada estado.\n");
     printf("Nao utilize pontos/virgulas, utilize apenas numeros.\n");
 
     for (int estado = 0; estado < NUM_ESTADOS; estado++) {
