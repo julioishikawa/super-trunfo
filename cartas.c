@@ -5,11 +5,14 @@
 
 char estados[] = "ABCDEFGH";
 
-void cadastrar_cartas(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES], float areas[NUM_ESTADOS][NUM_CIDADES],
-                      float pibs[NUM_ESTADOS][NUM_CIDADES], int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES],
-                      char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50]) {                       
+void cadastrar_cartas(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES],
+                      float areas[NUM_ESTADOS][NUM_CIDADES],
+                      float pibs[NUM_ESTADOS][NUM_CIDADES],
+                      int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES],
+                      char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50])
+{
     printf("\nVoce cadastrara as cidades para cada estado.\n");
-    printf("Nao utilize pontos/virgulas, utilize apenas numeros. \n");
+    printf("Nao utilize pontos/virgulas, utilize apenas numeros.\n");
 
     for (int estado = 0; estado < NUM_ESTADOS; estado++) {
         for (int cidade = 0; cidade < NUM_CIDADES; cidade++) {
@@ -19,7 +22,7 @@ void cadastrar_cartas(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES], fl
             while (1) {
                 printf("Nome da cidade: ");
                 fgets(nomes_cidades[estado][cidade], 50, stdin);
-                nomes_cidades[estado][cidade][strcspn(nomes_cidades[estado][cidade], "\n")] = '\0'; // Remove o newline extra
+                nomes_cidades[estado][cidade][strcspn(nomes_cidades[estado][cidade], "\n")] = '\0'; // Remove o newline
                 
                 if (strlen(nomes_cidades[estado][cidade]) > 0) {
                     break;
@@ -80,18 +83,21 @@ void cadastrar_cartas(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES], fl
         }
     }
 
-    // Agora o código vai esperar que o usuário pressione ENTER para retornar ao menu
-    printf("\nCadastro de cartas concluido! \nPressione ENTER para voltar ao menu...\n");
+    // Espera que o usuário pressione ENTER para retornar ao menu
+    printf("\nCadastro de cartas concluido!\nPressione ENTER para voltar ao menu...\n");
     getchar();  // Captura o ENTER que o usuário pressiona
 }
 
-void ver_cartas_cadastradas(char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50], unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES], 
-                             float areas[NUM_ESTADOS][NUM_CIDADES], float pibs[NUM_ESTADOS][NUM_CIDADES], 
-                             int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES]) {
+void ver_cartas_cadastradas(char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50],
+                            unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES],
+                            float areas[NUM_ESTADOS][NUM_CIDADES],
+                            float pibs[NUM_ESTADOS][NUM_CIDADES],
+                            int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES])
+{
     printf("\nVisualizando as cartas cadastradas...\n");
-    
+
     char formato_numero[50]; // Para armazenar os números formatados
-    
+
     for (int estado = 0; estado < NUM_ESTADOS; estado++) {
         printf("\nEstado: %c\n", estados[estado]);
         for (int cidade = 0; cidade < NUM_CIDADES; cidade++) {
@@ -116,8 +122,8 @@ void ver_cartas_cadastradas(char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50], un
             // Calcular densidade populacional, PIB per capita e super poder
             float densidade = calcular_densidade_populacional(populacoes[estado][cidade], areas[estado][cidade]);
             float pib_per_capita = calcular_pib_per_capita(pibs[estado][cidade], populacoes[estado][cidade]);
-            float super_poder = calcular_super_poder(pibs[estado][cidade], populacoes[estado][cidade], areas[estado][cidade], 
-                                                     pontos_turisticos[estado][cidade], densidade, pib_per_capita);
+            float super_poder = calcular_super_poder(pibs[estado][cidade], populacoes[estado][cidade], areas[estado][cidade],
+                                                    pontos_turisticos[estado][cidade], densidade, pib_per_capita);
 
             // Formatar e exibir a densidade populacional
             formatar_densidade_populacional(formato_numero, densidade);
@@ -140,117 +146,123 @@ void ver_cartas_cadastradas(char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50], un
     getchar();  // Captura o ENTER que o usuário pressiona
 }
 
-void comparar_cartas(int estado1, int estado2, int cidade1, int cidade2, int propriedade, 
-                     unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES], 
-                     float areas[NUM_ESTADOS][NUM_CIDADES], float pibs[NUM_ESTADOS][NUM_CIDADES], 
-                     int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES], char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50]) {
-
+void comparar_cartas(int estado1, int estado2, int cidade1, int cidade2, int propriedade,
+                     unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES],
+                     float areas[NUM_ESTADOS][NUM_CIDADES],
+                     float pibs[NUM_ESTADOS][NUM_CIDADES],
+                     int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES],
+                     char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50])
+{
     float valor1, valor2;
     char resultado1[50], resultado2[50];
     char *propriedade_str;
-    char simbolo_comparacao[3]; // Variável para armazenar o símbolo de comparação
+    char *simbolo_comparacao;  // Ponteiro para armazenar o símbolo de comparação
 
     // Coleta os valores das cidades com base na propriedade escolhida
     switch (propriedade) {
-        case 1: // População
+        case 1:  // População
             valor1 = populacoes[estado1][cidade1];
             valor2 = populacoes[estado2][cidade2];
             propriedade_str = "Populacao";
             formatar_numero_inteiro(resultado1, valor1);
             formatar_numero_inteiro(resultado2, valor2);
             break;
-        case 2: // Área
+        case 2:  // Área
             valor1 = areas[estado1][cidade1];
             valor2 = areas[estado2][cidade2];
             propriedade_str = "Area";
             formatar_numero_flutuante(resultado1, valor1);
             formatar_numero_flutuante(resultado2, valor2);
             break;
-        case 3: // PIB
+        case 3:  // PIB
             valor1 = pibs[estado1][cidade1];
             valor2 = pibs[estado2][cidade2];
             propriedade_str = "PIB";
             formatar_pib(resultado1, valor1);
             formatar_pib(resultado2, valor2);
             break;
-        case 4: // Densidade populacional
+        case 4:  // Densidade populacional
             valor1 = calcular_densidade_populacional(populacoes[estado1][cidade1], areas[estado1][cidade1]);
             valor2 = calcular_densidade_populacional(populacoes[estado2][cidade2], areas[estado2][cidade2]);
             propriedade_str = "Densidade Populacional";
             formatar_densidade_populacional(resultado1, valor1);
             formatar_densidade_populacional(resultado2, valor2);
             break;
-        case 5: // PIB per capita
+        case 5:  // PIB per capita
             valor1 = calcular_pib_per_capita(pibs[estado1][cidade1], populacoes[estado1][cidade1]);
             valor2 = calcular_pib_per_capita(pibs[estado2][cidade2], populacoes[estado2][cidade2]);
             propriedade_str = "PIB per Capita";
             formatar_pib_per_capita(resultado1, valor1);
             formatar_pib_per_capita(resultado2, valor2);
             break;
-        case 6: // Pontos turísticos
+        case 6:  // Pontos turísticos
             valor1 = pontos_turisticos[estado1][cidade1];
             valor2 = pontos_turisticos[estado2][cidade2];
             propriedade_str = "Pontos Turisticos";
             formatar_numero_inteiro(resultado1, valor1);
             formatar_numero_inteiro(resultado2, valor2);
             break;
-        case 7: // Super Poder
+        case 7:  // Super Poder
             valor1 = calcular_super_poder(pibs[estado1][cidade1], populacoes[estado1][cidade1], areas[estado1][cidade1],
-                                          pontos_turisticos[estado1][cidade1], calcular_densidade_populacional(populacoes[estado1][cidade1], areas[estado1][cidade1]),
+                                          pontos_turisticos[estado1][cidade1],
+                                          calcular_densidade_populacional(populacoes[estado1][cidade1], areas[estado1][cidade1]),
                                           calcular_pib_per_capita(pibs[estado1][cidade1], populacoes[estado1][cidade1]));
             valor2 = calcular_super_poder(pibs[estado2][cidade2], populacoes[estado2][cidade2], areas[estado2][cidade2],
-                                          pontos_turisticos[estado2][cidade2], calcular_densidade_populacional(populacoes[estado2][cidade2], areas[estado2][cidade2]),
+                                          pontos_turisticos[estado2][cidade2],
+                                          calcular_densidade_populacional(populacoes[estado2][cidade2], areas[estado2][cidade2]),
                                           calcular_pib_per_capita(pibs[estado2][cidade2], populacoes[estado2][cidade2]));
             propriedade_str = "Super Poder";
             formatar_super_poder(resultado1, valor1);
             formatar_super_poder(resultado2, valor2);
             break;
+        default:
+            printf("Propriedade invalida!\n");
+            return;
     }
 
     // Exibe a comparação
     printf("\nComparando %s:\n", propriedade_str);
 
-    // Verifica qual valor é maior ou menor e ajusta o símbolo de comparação
-    if (propriedade == 4) {  // Para densidade populacional, o menor valor vence
-        if (valor1 < valor2) {
-            strcpy(simbolo_comparacao, "<");
-            printf("(%s) %s <-> %s (%s)\n", nomes_cidades[estado1][cidade1], resultado1, resultado2, nomes_cidades[estado2][cidade2]);
-            printf("%s %s %s\n", resultado1, simbolo_comparacao, resultado2);
-            printf("%s venceu! (Menor densidade populacional)\n", nomes_cidades[estado1][cidade1]);
-        } else if (valor1 > valor2) {
-            strcpy(simbolo_comparacao, ">");
-            printf("(%s) %s <-> %s (%s)\n", nomes_cidades[estado1][cidade1], resultado1, resultado2, nomes_cidades[estado2][cidade2]);
-            printf("%s %s %s\n", resultado1, simbolo_comparacao, resultado2);
-            printf("%s venceu! (Menor densidade populacional)\n", nomes_cidades[estado2][cidade2]);
-        } else {
+    if (valor1 == valor2) {
+        if (propriedade == 4) {
             printf("Empate! Ambas as cidades têm a mesma densidade populacional.\n");
-        }
-    } else {  // Para as outras propriedades, o maior valor vence
-        if (valor1 > valor2) {
-            strcpy(simbolo_comparacao, ">");
-            printf("(%s) %s <-> %s (%s)\n", nomes_cidades[estado1][cidade1], resultado1, resultado2, nomes_cidades[estado2][cidade2]);
-            printf("%s %s %s\n", resultado1, simbolo_comparacao, resultado2);
-            printf("%s venceu! (Maior valor)\n", nomes_cidades[estado1][cidade1]);
-        } else if (valor1 < valor2) {
-            strcpy(simbolo_comparacao, "<");
-            printf("(%s) %s <-> %s (%s)\n", nomes_cidades[estado1][cidade1], resultado1, resultado2, nomes_cidades[estado2][cidade2]);
-            printf("%s %s %s\n", resultado1, simbolo_comparacao, resultado2);
-            printf("%s venceu! (Maior valor)\n", nomes_cidades[estado2][cidade2]);
         } else {
             printf("Empate! Ambas as cidades tem o mesmo valor para %s.\n", propriedade_str);
         }
+    } else {
+        // Define o símbolo de comparação com base na propriedade
+        simbolo_comparacao = (propriedade == 4)
+                             ? (valor1 < valor2 ? "<" : ">")
+                             : (valor1 > valor2 ? ">" : "<");
+
+        // Exibe a comparação dos resultados
+        printf("(%s) %s <-> %s (%s)\n",
+               nomes_cidades[estado1][cidade1],
+               resultado1,
+               resultado2,
+               nomes_cidades[estado2][cidade2]);
+        printf("%s %s %s\n", resultado1, simbolo_comparacao, resultado2);
+
+        // Determina o vencedor utilizando operadores ternários aninhados
+        printf("%s venceu! (%s)\n",
+               (propriedade == 4)
+                   ? (valor1 < valor2 ? nomes_cidades[estado1][cidade1] : nomes_cidades[estado2][cidade2])
+                   : (valor1 > valor2 ? nomes_cidades[estado1][cidade1] : nomes_cidades[estado2][cidade2]),
+               (propriedade == 4) ? "Menor densidade populacional" : "Maior valor");
     }
 
-    // Aguardar o usuário pressionar Enter para continuar
-    printf("\nPressione Enter para continuar...");
+    // Aguarda o usuário pressionar ENTER para continuar
+    printf("\nPressione ENTER para continuar...");
     limpar_buffer();
-    getchar();  // Aguarda o pressionamento de Enter
+    getchar();
 }
 
-
-void exibir_menu_comparacao(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES], float areas[NUM_ESTADOS][NUM_CIDADES],
-                             float pibs[NUM_ESTADOS][NUM_CIDADES], int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES], 
-                             char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50]) {
+void exibir_menu_comparacao(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADES],
+                             float areas[NUM_ESTADOS][NUM_CIDADES],
+                             float pibs[NUM_ESTADOS][NUM_CIDADES],
+                             int pontos_turisticos[NUM_ESTADOS][NUM_CIDADES],
+                             char nomes_cidades[NUM_ESTADOS][NUM_CIDADES][50])
+{
     int estado1, estado2, cidade1, cidade2, propriedade;
 
     // Exibe os estados cadastrados
@@ -265,13 +277,13 @@ void exibir_menu_comparacao(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADE
         }
         printf(")\n");
     }
-    
+
     // Escolhe o primeiro estado com verificação
     do {
         printf("\nDigite o numero do primeiro estado: ");
         scanf("%d", &estado1);
-        estado1--;  // Ajuste para índice 0
-        
+        estado1--;  // Ajusta para índice 0
+
         if (estado1 < 0 || estado1 >= NUM_ESTADOS) {
             printf("Erro: Estado invalido. Tente novamente.\n");
         }
@@ -281,8 +293,8 @@ void exibir_menu_comparacao(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADE
     do {
         printf("Digite o numero do segundo estado: ");
         scanf("%d", &estado2);
-        estado2--;  // Ajuste para índice 0
-        
+        estado2--;  // Ajusta para índice 0
+
         if (estado2 < 0 || estado2 >= NUM_ESTADOS) {
             printf("Erro: Estado invalido. Tente novamente.\n");
         }
@@ -307,8 +319,8 @@ void exibir_menu_comparacao(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADE
     do {
         printf("\nDigite o numero da primeira cidade (do estado %c): ", estados[estado1]);
         scanf("%d", &cidade1);
-        cidade1--;  // Ajuste para índice 0
-        
+        cidade1--;  // Ajusta para índice 0
+
         if (cidade1 < 0 || cidade1 >= NUM_CIDADES) {
             printf("Erro: Cidade invalida. Tente novamente.\n");
         }
@@ -318,8 +330,8 @@ void exibir_menu_comparacao(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADE
     do {
         printf("Digite o numero da segunda cidade (do estado %c): ", estados[estado2]);
         scanf("%d", &cidade2);
-        cidade2--;  // Ajuste para índice 0
-        
+        cidade2--;  // Ajusta para índice 0
+
         if (cidade2 < 0 || cidade2 >= NUM_CIDADES) {
             printf("Erro: Cidade invalida. Tente novamente.\n");
         }
@@ -334,26 +346,27 @@ void exibir_menu_comparacao(unsigned long int populacoes[NUM_ESTADOS][NUM_CIDADE
     printf("5. PIB per Capita\n");
     printf("6. Pontos Turisticos\n");
     printf("7. Super Poder\n");
-    
+
     // Escolhe a propriedade com verificação
     do {
         printf("\nDigite o numero da propriedade: ");
         scanf("%d", &propriedade);
-        
+
         if (propriedade < 1 || propriedade > 7) {
             printf("Erro: Propriedade invalida. Tente novamente.\n");
         }
     } while (propriedade < 1 || propriedade > 7);
 
-    // Chama a função de comparação e passa as variáveis corretamente
-    comparar_cartas(estado1, estado2, cidade1, cidade2, propriedade, populacoes, areas, pibs, pontos_turisticos, nomes_cidades);
+    // Chama a função de comparação
+    comparar_cartas(estado1, estado2, cidade1, cidade2, propriedade,
+                    populacoes, areas, pibs, pontos_turisticos, nomes_cidades);
 }
 
-void exibir_menu() {
+void exibir_menu()
+{
     printf("Bem-vindo ao sistema de cadastro de cartas do Super Trunfo - Tema: Paises\n");
     printf("\n1. Cadastrar Cartas\n");
     printf("2. Ver Cartas Cadastradas\n");
     printf("3. Comparar Cartas\n\n");
-   
     printf("Escolha uma opcao: \n");
 }
